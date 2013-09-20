@@ -21,7 +21,7 @@ public class OraculData {
     public final double H3[] = new double[NODES_COUNT];
 
     public final double fiBndCnd[][][][] = new double[2][3][2][SZ_LAM];
-    double lamBndCnd[][][][] = new double[2][3][2][SZ_FI];
+    public final double lamBndCnd[][][][] = new double[2][3][2][SZ_FI];
 
     public final double H[] = new double[NODES_COUNT];
     public final double U1[] = new double[NODES_COUNT];
