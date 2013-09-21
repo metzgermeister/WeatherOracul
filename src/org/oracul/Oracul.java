@@ -8,7 +8,6 @@ import static org.oracul.Utils.*;
 import org.oracul.data.ForecastInfo;
 import org.oracul.data.OraculData;
 
-import java.io.File;
 
 /**
  * User: Pavlo_Ivanenko Date: 9/20/13 Time: 3:01 PM
@@ -37,7 +36,7 @@ public class Oracul {
             splitFi(data.U, data.C, data.Mu2, data.F2, data.U2);
 
             // Calc v
-            // SetFV(data.U, data.V, data.H, data.F1, data.F2);
+            setFV(data.U, data.V, data.H, data.F1, data.F2);
 
             System.arraycopy(data.U, 0, data.C, 0, SZ_LAM * SZ_FI);
             splitLam(data.V, data.C, data.Mu1, data.F1, data.V1);
@@ -51,23 +50,6 @@ public class Oracul {
         }
 
         // CalcNorma(2. * (i - 1) * dt / T);
-    }
-
-    private void setFU(double[] UU, double[] VV, double[] HH, double[] FF1, double[] FF2) {
-        int i, j;
-        double cs, sn, g;
-
-        for (j = 1; j <= (SZ_FI - 2); j++) {
-            cs = ERH_RDS * cos(j * dh);
-            sn = dt * sin(j * dh);
-            g = dt * fG(SRF_ALT, j * dh) / (2. * cs * dh);
-            for (i = 1; i <= (SZ_LAM - 2); i++) {
-                FF1[j * SZ_LAM + i] = -g * (HH[j * SZ_LAM + i + 1] - HH[j * SZ_LAM + i - 1]);
-                FF2[j * SZ_LAM + i] = sn * VV[j * SZ_LAM + i] * (UU[j * SZ_LAM + i] / cs +
-                        2. * ERH_OMEGA);
-            }
-        }
-
     }
 
 
@@ -250,6 +232,41 @@ public class Oracul {
             R2[j * SZ_LAM + i] = R2[(j + 1) * SZ_LAM + i] + (R[j * SZ_LAM + i] - R2[(j + 1) * SZ_LAM + i]
                     + q * (R[(j - 1) * SZ_LAM + i] - R[j * SZ_LAM + i]) + FF2[j * SZ_LAM + i]) / (1. + p);
         }
+    }
+
+
+    private void setFV(double[] UU, double[] VV, double[] HH, double[] FF1, double[] FF2) {
+        int i, j;
+        double cs, sn, g;
+
+        for (j = 1; j <= (SZ_FI - 2); j++) {
+            cs = ERH_RDS * cos(j * dh);
+            sn = dt * sin(j * dh);
+            g = dt * fG(SRF_ALT, j * dh) / (2. * dh * ERH_RDS);
+            for (i = 1; i <= (SZ_LAM - 2); i++) {
+                //TODO maybe here is mistake and VV data should be used
+                FF1[j * SZ_LAM + i] = -sn * UU[j * SZ_LAM + i] * (UU[j * SZ_LAM + i] / cs +
+                        2. * ERH_OMEGA);
+                FF2[j * SZ_LAM + i] = -g * (HH[(j + 1) * SZ_LAM + i] - HH[(j - 1) * SZ_LAM + i]);
+            }
+        }
+    }
+
+    private void setFU(double[] UU, double[] VV, double[] HH, double[] FF1, double[] FF2) {
+        int i, j;
+        double cs, sn, g;
+
+        for (j = 1; j <= (SZ_FI - 2); j++) {
+            cs = ERH_RDS * cos(j * dh);
+            sn = dt * sin(j * dh);
+            g = dt * fG(SRF_ALT, j * dh) / (2. * cs * dh);
+            for (i = 1; i <= (SZ_LAM - 2); i++) {
+                FF1[j * SZ_LAM + i] = -g * (HH[j * SZ_LAM + i + 1] - HH[j * SZ_LAM + i - 1]);
+                FF2[j * SZ_LAM + i] = sn * VV[j * SZ_LAM + i] * (UU[j * SZ_LAM + i] / cs +
+                        2. * ERH_OMEGA);
+            }
+        }
+
     }
 
 
