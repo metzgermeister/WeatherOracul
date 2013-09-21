@@ -2,11 +2,13 @@ package org.oracul;
 
 import static java.lang.Math.*;
 import static org.oracul.OraculConstants.*;
-import static org.oracul.Utils.fRo;
-import static org.oracul.Utils.quadrInterpol;
+import static org.oracul.Utils.*;
+
 
 import org.oracul.data.ForecastInfo;
 import org.oracul.data.OraculData;
+
+import java.io.File;
 
 /**
  * User: Pavlo_Ivanenko Date: 9/20/13 Time: 3:01 PM
@@ -27,7 +29,7 @@ public class Oracul {
             setActualH(2. * i * dt / T, data.H);
 
             // Calc u
-            // SetFU(data.U, data.V, data.H, data.F1, data.F2);
+            setFU(data.U, data.V, data.H, data.F1, data.F2);
             System.arraycopy(data.U, 0, data.C, 0, SZ_LAM * SZ_FI);
             // SplitLam(data.U, data.C, data.Mu1, data.F1, data.U1);
 
@@ -49,9 +51,25 @@ public class Oracul {
         }
 
         // CalcNorma(2. * (i - 1) * dt / T);
-        // SaveToFile('u', data.U);
-        // SaveToFile('v', data.V);
     }
+
+    private void setFU(double[] UU, double[] VV, double[] HH, double[] FF1, double[] FF2) {
+        int i, j;
+        double cs, sn, g;
+
+        for (j = 1; j <= (SZ_FI - 2); j++) {
+            cs = ERH_RDS * cos(j * dh);
+            sn = dt * sin(j * dh);
+            g = dt * fG(SRF_ALT, j * dh) / (2. * cs * dh);
+            for (i = 1; i <= (SZ_LAM - 2); i++) {
+                FF1[j * SZ_LAM + i] = -g * (HH[j * SZ_LAM + i + 1] - HH[j * SZ_LAM + i - 1]);
+                FF2[j * SZ_LAM + i] = sn * VV[j * SZ_LAM + i] * (UU[j * SZ_LAM + i] / cs +
+                        2. * ERH_OMEGA);
+            }
+        }
+
+    }
+
 
     private void setMu(double[] UU, double[] VV, double[] M1, double[] M2) {
         int i, j;

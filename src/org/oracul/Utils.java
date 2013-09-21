@@ -18,4 +18,10 @@ public final class Utils {
     public static double fRo(double z) {
         return 1.22 * exp(-RO_RATE * z);
     }
+
+
+    public static double fG(double z, double fi) {
+        double cs = Math.cos(2. * fi);
+        return OraculConstants.ERH_G - 0.025928 * cs + (6.9e-5) * cs * cs - (3.086e-6) * z;
+    }
 }
