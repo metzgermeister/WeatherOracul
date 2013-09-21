@@ -45,11 +45,12 @@ public class Oracul {
             splitFi(data.V, data.C, data.Mu2, data.F2, data.V2);
 
             // Final
-            // SplitSum(data.U, data.U1, data.U2);
-            // SplitSum(data.V, data.V1, data.V2);
+            splitSum(data.U, data.U1, data.U2);
+            splitSum(data.V, data.V1, data.V2);
         }
 
-        // CalcNorma(2. * (i - 1) * dt / T);
+        сalcNorma(2. * (i - 1) * dt / T, data.U2, data.V2, data.U, data.V);
+
     }
 
 
@@ -267,6 +268,89 @@ public class Oracul {
             }
         }
 
+    }
+
+
+    private void splitSum(double[] UU, double[] UU1, double[] UU2) {
+        int i, j;
+
+        for (i = 1; i <= (SZ_FI - 2); i++)
+            for (j = 1; j <= (SZ_LAM - 2); j++)
+                UU[i * SZ_LAM + j] = UU1[i * SZ_LAM + j] + UU2[i * SZ_LAM + j] - UU[i * SZ_LAM + j];
+
+        // Boundary condition
+        for (j = 0; j <= (SZ_LAM - 1); j += (SZ_LAM - 1))
+            for (i = 0; i <= (SZ_FI - 1); i++)
+                UU[i * SZ_LAM + j] = UU1[i * SZ_LAM + j];
+
+        for (i = 0; i <= (SZ_FI - 1); i += (SZ_FI - 1))
+            for (j = 0; j <= (SZ_LAM - 1); j++)
+                UU[i * SZ_LAM + j] = UU2[i * SZ_LAM + j];
+
+    }
+
+
+    private void сalcNorma(double r, double[] pU2, double[] pV2, double[] pU, double[] pV) {
+        int i, j;
+        double maxU = 0., L2U = 0., maxV = 0., L2V = 0., z;
+
+        loadOriginalValues(r, pU2, pV2);
+        // For u
+        for (j = 1; j <= (SZ_FI - 2); j++)
+            for (i = 1; i <= (SZ_LAM - 2); i++) {
+                z = pU2[j * SZ_LAM + i] - pU[j * SZ_LAM + i];
+                z *= z;
+                L2U += z;
+                if (z > maxU) maxU = z;
+            }
+        maxU = sqrt(maxU);
+        L2U = dh * sqrt(L2U);
+
+        // For v
+        for (j = 1; j <= (SZ_FI - 2); j++)
+            for (i = 1; i <= (SZ_LAM - 2); i++) {
+                z = pV2[j * SZ_LAM + i] - pV[j * SZ_LAM + i];
+                z *= z;
+                L2V += z;
+                if (z > maxV) maxV = z;
+            }
+        maxV = sqrt(maxV);
+        L2V = dh * sqrt(L2V);
+
+        String statistics = String.format("maxU=%9.2e L2U=%9.2e\nmaxV=%9.2e L2V=%9.2e\n", maxU, L2U, maxV, L2V);
+        System.out.println(statistics);
+
+    }
+
+
+    private void loadOriginalValues(double r, double[] pUU1, double[] pVV1) {
+//        char buf[];
+//        int i, j, k;
+//        double[][] pArOut = new double[2][];
+//        pArOut[0] = pUU1;
+//        pArOut[1] = pVV1;
+//        double[] z = new double[3];
+//        File * pFile[3];
+//
+//        for (i = 0; i <= 1; i++) {
+//            for (k = 0; k <= 2; k++) {
+//                sprintf(buf, "IN\\%s", flNames[3 * k + 1 + i]);
+//                pFile[k] = fopen(buf, "r");
+//            }
+//
+//            for (j = 0; j <= (SZ_FI * SZ_LAM - 1); j++) {
+//                for (k = 0; k <= 2; k++) {
+//                    fgets(buf, 64, pFile[k]);
+//                    z[k] = atof(buf);
+//                }
+//                pArOut[i][j] = quadrInterpol(r, z[0], z[1], z[2]);
+//            }
+//
+//            for (k = 0; k <= 2; k++) {
+//                fclose(pFile[k]);
+//            }
+//        }
+//
     }
 
 
