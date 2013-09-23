@@ -1,4 +1,4 @@
-package org.oracul;
+package org.oracul.util;
 
 public class OraculConstants {
     public static final int SZ_LAM = 61;

@@ -1,17 +1,16 @@
 package org.oracul;
 
-import java.io.*;
+import java.io.FileNotFoundException;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.Date;
 
 import org.oracul.data.ForecastInfo;
 import org.oracul.data.OraculData;
 
-import static org.oracul.OraculConstants.SZ_FI;
-import static org.oracul.OraculConstants.SZ_LAM;
-
 public class Launcher {
 
-    public static final int TIME_STEP = 1;
+    public static final int TIME_STEP = 100;
     public static final int TIME_LIMIT = 3600;
 
     public static void main(String[] args) throws IOException {
@@ -22,9 +21,8 @@ public class Launcher {
 
         long tv1 = new Date().getTime();
         OraculData oraculData = loadDataFromFiles();
-        Oracul oracul = new Oracul(oraculData);
+        Oracul oracul = new SequentialOracul(oraculData);
         oracul.predict(new ForecastInfo(TIME_STEP, TIME_LIMIT));
-
 
         long tv2 = new Date().getTime();
         System.out.println("time took:" + (tv2 - tv1));
@@ -46,7 +44,6 @@ public class Launcher {
         data.importData(inputDirectory);
         return data;
     }
-
 
     private void saveToFile(String pathToFile, double[] data) throws IOException {
         System.out.println("writing data to file " + pathToFile);

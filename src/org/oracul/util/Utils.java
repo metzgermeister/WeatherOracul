@@ -1,7 +1,7 @@
-package org.oracul;
+package org.oracul.util;
 
 import static java.lang.Math.exp;
-import static org.oracul.OraculConstants.RO_RATE;
+import static org.oracul.util.OraculConstants.RO_RATE;
 
 /**
  * User: Pavlo_Ivanenko Date: 9/20/13 Time: 6:19 PM

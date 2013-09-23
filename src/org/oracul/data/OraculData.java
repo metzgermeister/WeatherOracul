@@ -1,7 +1,7 @@
 package org.oracul.data;
 
-import static org.oracul.OraculConstants.SZ_FI;
-import static org.oracul.OraculConstants.SZ_LAM;
+import static org.oracul.util.OraculConstants.SZ_FI;
+import static org.oracul.util.OraculConstants.SZ_LAM;
 
 import java.io.File;
 import java.io.FileNotFoundException;
